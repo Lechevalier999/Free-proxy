@@ -22,7 +22,6 @@ app.get('/proxy', async (req, res) => {
     response.headers.forEach((value, name) => {
       res.setHeader(name, value);
     });
-    // Pipe response body
     const body = await response.buffer();
     res.send(body);
   } catch (err) {
