@@ -97,7 +97,6 @@ form.addEventListener('submit', function(e) {
       return response.text();
     })
     .then(html => {
-      // WARNING: using innerHTML can be unsafe! For demo only.
       embedArea.innerHTML = html;
       setStatus('Loaded!', false);
     })
