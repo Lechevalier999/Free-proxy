@@ -89,9 +89,7 @@
         setStatus('Invalid URL. Please enter a valid website URL.');
         return;
       }
-      // Build the proxy URL
       const proxiedUrl = cors_api_url + url.href;
-      // Create and show the iframe
       const iframe = document.createElement('iframe');
       iframe.src = proxiedUrl;
       iframe.onload = function() {
