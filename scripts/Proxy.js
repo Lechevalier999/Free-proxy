@@ -2,12 +2,16 @@ const express = require('express');
 const fetch = require('node-fetch');
 
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
+});
+
+app.get('/', (req, res) => {
+  res.send('CORS Proxy Server is running!');
 });
 
 app.get('/proxy', async (req, res) => {
@@ -29,5 +33,5 @@ app.get('/proxy', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`CORS proxy running on http://localhost:${PORT}`);
+  console.log(`CORS proxy running on port ${PORT}`);
 });
