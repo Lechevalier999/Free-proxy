@@ -61,45 +61,50 @@
     <div id="embedArea"></div>
   </div>
   <script>
-    const cors_api_url = 'N/A';
+const cors_api_url = 'N/A';
 
-    const form = document.getElementById('proxyForm');
-    const urlInput = document.getElementById('siteurl');
-    const statusDiv = document.getElementById('status');
-    const embedArea = document.getElementById('embedArea');
+const form = document.getElementById('proxyForm');
+const urlInput = document.getElementById('siteurl');
+const statusDiv = document.getElementById('status');
+const embedArea = document.getElementById('embedArea');
 
-    function setStatus(msg, isError = true) {
-      statusDiv.textContent = msg;
-      statusDiv.style.color = isError ? '#d32f2f' : '#388e3c';
-    }
+function setStatus(msg, isError = true) {
+  statusDiv.textContent = msg;
+  statusDiv.style.color = isError ? '#d32f2f' : '#388e3c';
+}
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const rawUrl = urlInput.value.trim();
-      embedArea.innerHTML = '';
-      setStatus('');
-      if (!rawUrl) {
-        setStatus('Please enter a website URL.');
-        return;
-      }
-      let url;
-      try {
-        url = new URL(rawUrl);
-      } catch {
-        setStatus('Invalid URL. Please enter a valid website URL.');
-        return;
-      }
-      const proxiedUrl = cors_api_url + url.href;
-      const iframe = document.createElement('iframe');
-      iframe.src = proxiedUrl;
-      iframe.onload = function() {
-        setStatus('Loaded!', false);
-      };
-      iframe.onerror = function() {
-        setStatus('Unable to load the site. The site may block embedding, or the proxy is unavailable. Sorry.');
-      };
-      embedArea.appendChild(iframe);
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const rawUrl = urlInput.value.trim();
+  embedArea.innerHTML = '';
+  setStatus('');
+  if (!rawUrl) {
+    setStatus('Please enter a website URL.');
+    return;
+  }
+  let url;
+  try {
+    url = new URL(rawUrl);
+  } catch {
+    setStatus('Invalid URL. Please enter a valid website URL.');
+    return;
+  }
+  setStatus('Loading...', false);
+
+  fetch(cors_api_url + encodeURIComponent(url.href))
+    .then(response => {
+      if (!response.ok) throw new Error('Proxy error: ' + response.statusText);
+      return response.text();
+    })
+    .then(html => {
+      // WARNING: using innerHTML can be unsafe! For demo only.
+      embedArea.innerHTML = html;
+      setStatus('Loaded!', false);
+    })
+    .catch(err => {
+      setStatus('Unable to load the site. The site may block embedding, or the proxy is unavailable. Sorry.');
     });
+});
   </script>
 </body>
 </html>
