@@ -4,7 +4,6 @@ const fetch = require('node-fetch');
 const app = express();
 const PORT = 8080;
 
-// Allow all origins (for demo purposes; restrict in production!)
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
