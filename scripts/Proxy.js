@@ -18,7 +18,6 @@ app.get('/proxy', async (req, res) => {
 
   try {
     const response = await fetch(targetUrl, { method: 'GET' });
-    // Copy original headers
     response.headers.forEach((value, name) => {
       res.setHeader(name, value);
     });
