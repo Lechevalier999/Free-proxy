@@ -5,11 +5,9 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Serve static files (adjust path if your files are in a 'public' folder)
 app.use(express.static(path.join(__dirname, '..')));
 
 app.get('/', (req, res) => {
-  // Adjust the path if Search bar.html is not in the root
   res.sendFile(path.join(__dirname, '../Search bar.html'));
 });
 
