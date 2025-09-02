@@ -1,12 +1,8 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-app.use(express.static(path.join(__dirname, '..')));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -19,19 +15,22 @@ app.use((req, res, next) => {
   next();
 });
 
-app.all('/proxy', async (req, res) => {
-  const targetUrl = req.query.url || req.body.url;
-  if (!targetUrl) return res.status(400).send('Missing url parameter');
 
-  // Build fetch options
+app.all('*', async (req, res) => {
+  const targetUrl = req.query.url || req.body?.url || req.headers['x-target-url'];
+  if (!targetUrl) return res.status(400).send('Missing target URL (use ?url=, body {url}, or header x-target-url)');
+
+  
   const fetchOptions = {
     method: req.method,
-    headers: Object.assign({}, req.headers),
+    headers: { ...req.headers },
     redirect: 'follow',
   };
 
   delete fetchOptions.headers['host'];
+  delete fetchOptions.headers['content-length'];
 
+  // Forward body if present
   if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
     if (req.is('application/json')) {
       fetchOptions.body = JSON.stringify(req.body);
@@ -45,10 +44,10 @@ app.all('/proxy', async (req, res) => {
   try {
     const proxyRes = await fetch(targetUrl, fetchOptions);
 
+    // Forward target's status code and headers
     res.status(proxyRes.status);
     proxyRes.headers.forEach((value, name) => {
       if (name.toLowerCase() === 'set-cookie') {
-        // Forward all Set-Cookie headers
         res.append('set-cookie', value);
       } else {
         res.setHeader(name, value);
@@ -59,10 +58,6 @@ app.all('/proxy', async (req, res) => {
   } catch (err) {
     res.status(500).send('Error fetching target: ' + err.message);
   }
-});
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../Search bar.html'));
 });
 
 app.listen(PORT, () => {
