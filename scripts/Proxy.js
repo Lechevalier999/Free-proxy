@@ -44,7 +44,7 @@ app.all('*', async (req, res) => {
   try {
     const proxyRes = await fetch(targetUrl, fetchOptions);
 
-    // Forward target's status code and headers
+    
     res.status(proxyRes.status);
     proxyRes.headers.forEach((value, name) => {
       if (name.toLowerCase() === 'set-cookie') {
